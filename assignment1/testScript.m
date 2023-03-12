@@ -10,9 +10,10 @@ disp("x = ");
 disp(x);
 % Quantize input values
 q_ind = UniformQuantizer(x, n_bits, xmax, m);
-disp("our = ");
+disp("Quantizer = ");
 disp(q_ind);
 
-q_ind = Uniform(x, n_bits, xmax, m);
-disp("his = ");
+
+deq_val=UniformDequantizer(q_ind,n_bits,xmax,m)
+disp("Dequantizer = ");
 disp(q_ind);
