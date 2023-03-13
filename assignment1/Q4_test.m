@@ -24,7 +24,7 @@ for i = 1:length(n_bits)
     quant_error = in_val - deq_val;
 
     % Calculate SNR
-    simulated_snr(i) = 10*log10(sum(in_val.^2)/sum(quant_error.^2));
+    simulated_snr(i) = 10*log10(mean(in_val.^2)/mean(quant_error.^2));
 end
 
 % Plot theoretical and simulated SNR

@@ -1,39 +1,49 @@
 % Parameters
-n_bits = 3;
+n_bits = 2:1:8;
 xmax = 5;
-mu_values = [0, 5, 100, 200];
+mu_values = [0.0001, 5, 100, 200];
 
 % Generate input signal
+% Generate the random input
 rng('default'); % For reproducibility
-x = rand(1, 10000);
-polarity = sign(x - 0.5);
-magnitude = exprnd(1, 1, 10000);
-input_signal = polarity .* magnitude;
+polarity = 2 * randi([0 1], 1, 10000) - 1; % +/- with probability 0.5
+magnitude = exprnd(1, 1, 10000); % Exponential distribution
+in_val = polarity .* magnitude; % Combine polarity and magnitude
+
+% Calculate theoretical SNR
+theoretical_snr = 6.02 * n_bits + 1.76;
+
+
 
 % Non-uniform mu-law quantization
 for i = 1:length(mu_values)
+    % Calculate SNR for each n_bits value
+    simulated_snr = zeros(size(n_bits));
     mu = mu_values(i);
-    expanded_signal = sign(input_signal) .* log(1 + mu * abs(input_signal) / xmax) / log(1 + mu);
-    q_ind = UniformQuantizer(expanded_signal, n_bits, xmax, 0);
-    %     s = (q_ind - 2 ^ (n_bits - 1)) * (2 * xmax / (2 ^ n_bits - 1));
-    %     quantized_signal = sign(s) .* (exp(abs(s) * log(1 + mu)) - 1) / mu;
-    %     deq_val = UniformDequantizer(q_ind, n_bits, xmax, m);
-    %     quantized_signal=deq_val;
-    compressed_signal = sign(quantized_signal) .* ((1 + mu) .^ abs(quantized_signal) - 1) / (mu * sign(quantized_signal));
+    for n = 1:length(n_bits)
+        % Compress input signal
+        compressed_signal = sign(in_val) .* log(1 + mu * abs(in_val)) / log(1 + mu);
+        
+        % Quantize input signal
+        q_ind = UniformQuantizer(compressed_signal, n, xmax, 0);
+        
+        % Dequantize input signal
+        deq_val = UniformDequantizer(q_ind, n, xmax, m);
+
+        % Expand input signal
+        expanded_signal = sign(deq_val) .* (1/mu) .* ((1+mu).^abs(deq_val) - 1);
+        
+        % Calculate quantization error
+        quant_error = in_val - expanded_signal;
+
+        % Calculate SNR
+        simulated_snr(n) = 10*log10(mean(in_val.^2)/mean(quant_error.^2));
+    end
     figure;
-    plot(input_signal);
-    hold on;
-    plot(compressed_signal);
+    % Plot theoretical and simulated SNR
+    plot(n_bits, theoretical_snr, 'r-', n_bits, simulated_snr, 'bo');
+    xlabel('Number of Bits');
+    ylabel('SNR (dB)');
+    legend('Theoretical', 'Simulated');
     title(['Input vs. Output for \mu = ' num2str(mu)]);
-    xlabel('Sample index');
-    ylabel('Signal value');
-    legend('Input', 'Output');
-
-    figure;
-    plot(input_signal);
-    legend('Input');
-    figure
-    plot(deq_val);
-    legend('Output');
-
 end
