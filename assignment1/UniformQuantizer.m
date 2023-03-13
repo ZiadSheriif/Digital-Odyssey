@@ -22,5 +22,5 @@ function q_ind = UniformQuantizer(in_val, n_bits, xmax, m)
     for i = 1:length(in_val)
         %disp(["error",abs(in_val(i)-q_levels)]);
         [~,q_ind(i)] = min(abs(in_val(i)-q_levels));
-        disp(q_levels(q_ind(i)));
+        %disp(q_levels(q_ind(i)));
 end
