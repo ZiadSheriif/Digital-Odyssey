@@ -1,26 +1,27 @@
-% in_val : vector with original samples
-% n_bits : the number of bits available
-% xmax and m define the range of the quantizer from m? /2-xmax to m? /2+xmax
 function q_ind = UniformQuantizer(in_val, n_bits, xmax, m)
-    % Calculate the number of quantization intervals
-    L = 2^n_bits;
-    disp(["L = ",L]);
-    % Calculate the width of each quantization interval
-    delta = (2*xmax)/L;
-    
-    disp(["delta = ",delta]);
-    
-    q_levels = (m*delta)/(2)- xmax:delta:(m*delta)/(2) + xmax;
-    
-    disp(["q_levels",q_levels]);
-    
-    % Quantize the input values
-    q_ind = zeros(size(in_val));
-    
-    % Quantize the input values
-    q_ind = zeros(size(in_val));
+    L = 2 .^ n_bits;
+    delta = (2 * xmax) / L;
+    levels = (m * delta / 2) - xmax:delta:(m * delta / 2) + xmax;
+
+    q_ind = zeros(1, length(in_val));
+
     for i = 1:length(in_val)
-        %disp(["error",abs(in_val(i)-q_levels)]);
-        [~,q_ind(i)] = min(abs(in_val(i)-q_levels));
-        %disp(q_levels(q_ind(i)));
+
+        for j = 1:length(levels) - 1
+
+            if (in_val(i) <= levels(1))
+                q_ind(i) = 1;
+                break;
+            elseif (in_val(i) >= levels(length(levels)))
+                q_ind(i) = length(levels) - 1;
+                break;
+            elseif (in_val(i) >= levels(j) && in_val(i) <= levels(j + 1))
+                q_ind(i) = j;
+                break
+            end
+
+        end
+
+    end
+
 end

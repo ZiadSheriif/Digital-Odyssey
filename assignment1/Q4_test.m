@@ -1,5 +1,5 @@
 % Generate input signal
-in_val = 10*(rand(1, 10000) - 0.5);
+in_val = 10 * (rand(1, 10000) - 0.5);
 
 % Define quantization parameters
 xmax = 5;
@@ -8,11 +8,15 @@ m = 0;
 % Define range of n_bits
 n_bits = 2:1:8;
 
+L = 2 .^ n_bits;
+P = mean(in_val .^ 2);
+
 % Calculate theoretical SNR
-theoretical_snr = 6.02 * n_bits + 1.76;
+theoretical_snr = zeros(size(n_bits));
 
 % Calculate SNR for each n_bits value
 simulated_snr = zeros(size(n_bits));
+
 for i = 1:length(n_bits)
     % Quantize input signal
     q_ind = UniformQuantizer(in_val, n_bits(i), xmax, m);
@@ -23,8 +27,10 @@ for i = 1:length(n_bits)
     % Calculate quantization error
     quant_error = in_val - deq_val;
 
+    % Calculate theoretical SNR
+    theoretical_snr(i) = 10 * log10(P / (((xmax) .^ 2) / (3 * ((L(i) .^ 2)))));
     % Calculate SNR
-    simulated_snr(i) = 10*log10(mean(in_val.^2)/mean(quant_error.^2));
+    simulated_snr(i) = 10 * log10(mean(in_val .^ 2) / mean(quant_error .^ 2));
 end
 
 % Plot theoretical and simulated SNR
