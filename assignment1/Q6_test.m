@@ -16,15 +16,19 @@ xmax = max(abs(in_val));
 % Calculate theoretical SNR
 theoretical_snr = zeros(size(n_bits));
 
+ max_val = max(in_val);
 % Non-uniform mu-law quantization
 for i = 1:length(mu_values)
     % Calculate SNR for each n_bits value
     simulated_snr = zeros(size(n_bits));
     mu = mu_values(i);
-
+   
     for n = 1:length(n_bits)
+        % Normalize the signal
+        normalized = in_val / max_val;
+        
         % Compress input signal
-        compressed_signal = sign(in_val) .* log(1 + mu * abs(in_val)) / log(1 + mu);
+        compressed_signal = sign(normalized) .* log(1 + mu * abs(normalized)) / log(1 + mu);
 
         % Quantize input signal
         q_ind = UniformQuantizer(compressed_signal, n, xmax, 0);
@@ -35,10 +39,14 @@ for i = 1:length(mu_values)
         % Expand input signal
         expanded_signal = sign(deq_val) .* (1 / mu) .* ((1 + mu) .^ abs(deq_val) - 1);
 
+        % Normalize the signal
+        denormalized = expanded_signal * max_val;
+        
         % Calculate quantization error
-        quant_error = in_val - expanded_signal;
+        quant_error = in_val - denormalized;
 
-        theoretical_snr(i) = 10 * log10(P / (((xmax) .^ 2) / (3 * ((L(i) .^ 2)))));
+        % Calculate theoritical SNR
+        theoretical_snr(i) = 10 * log10((P / (((xmax) .^ 2)) * (3 * ((L(i) .^ 2)))));
 
         % Calculate SNR
         simulated_snr(n) = 10 * log10(mean(in_val .^ 2) / mean(quant_error .^ 2));
