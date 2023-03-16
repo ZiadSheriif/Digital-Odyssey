@@ -6,22 +6,7 @@ function q_ind = UniformQuantizer(in_val, n_bits, xmax, m)
     q_ind = zeros(1, length(in_val));
 
     for i = 1:length(in_val)
-
-        for j = 1:length(levels) - 1
-
-            if (in_val(i) <= levels(1))
-                q_ind(i) = 1;
-                break;
-            elseif (in_val(i) >= levels(length(levels)))
-                q_ind(i) = length(levels) - 1;
-                break;
-            elseif (in_val(i) >= levels(j) && in_val(i) <= levels(j + 1))
-                q_ind(i) = j;
-                break
-            end
-
-        end
-
+        q_ind(i) = min(max(floor((in_val(i) + -1*levels(1))/delta) + 1,1),length(levels) - 1);
     end
 
 end

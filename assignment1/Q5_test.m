@@ -43,9 +43,3 @@ xlabel('Number of Bits');
 ylabel('SNR (dB)');
 legend('Theoretical', 'Simulated');
 
-% Plot the input and output signals
-figure;
-plot(in_val);
-hold on;
-plot(deq_val);
-legend('Input', 'Output');
