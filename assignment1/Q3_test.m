@@ -8,8 +8,7 @@ x = -6:0.01:6;
 y_quant_m0 = UniformQuantizer(x, n_bits, xmax, 0);
 y_quant_m1 = UniformQuantizer(x, n_bits, xmax, 1);
 
-disp(y_quant_m0);
-disp(y_quant_m1);
+
 y_dequant_m0 = UniformDequantizer(y_quant_m0, n_bits, xmax, 0);
 y_dequant_m1 = UniformDequantizer(y_quant_m1, n_bits, xmax, 1);
 
