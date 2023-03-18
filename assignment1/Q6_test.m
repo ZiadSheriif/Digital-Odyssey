@@ -1,6 +1,6 @@
 % Parameters
 n_bits = 2:1:8;
-mu_values = [0, 5, 100, 200];
+mu_values = [0.001, 5, 100, 200];
 
 plot_arr = zeros(1, length(n_bits));
 L = 2 .^ n_bits;
@@ -43,7 +43,7 @@ for i = 1:length(mu_values)
         % Quantize input signal
         q_ind = UniformQuantizer(compressed_signal, n_bits(j), y_max, 0);
         
-        disp(q_ind);
+        
         % Dequantize input signal
         deq_val = UniformDequantizer(q_ind, n_bits(j), y_max, 0);
 
