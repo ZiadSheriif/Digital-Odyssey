@@ -1,6 +1,6 @@
 % Parameters
 n_bits = 2:1:8;
-mu_values = [0.001, 5, 100, 200];
+mu_values = [0, 5, 100, 200];
 
 plot_arr = zeros(1, length(n_bits));
 L = 2 .^ n_bits;
@@ -15,9 +15,7 @@ P = mean(in_val .^ 2);
 
 % xmax = max(abs(in_val));
 
-
 colors = ['c' 'b' 'm' 'g'];
-
 
 % Non-uniform mu-law quantization
 for i = 1:length(mu_values)
@@ -42,8 +40,7 @@ for i = 1:length(mu_values)
 
         % Quantize input signal
         q_ind = UniformQuantizer(compressed_signal, n_bits(j), y_max, 0);
-        
-        
+
         % Dequantize input signal
         deq_val = UniformDequantizer(q_ind, n_bits(j), y_max, 0);
 
@@ -64,14 +61,16 @@ for i = 1:length(mu_values)
         % Calculate SNR
         simulated_snr(j) = 10 * log10(P / mean(quant_error .^ 2));
     end
+
     hold on;
     % Plot theoretical and simulated SNR
     %plot(n_bits, theoretical_snr, colorsTheo(i), n_bits, simulated_snr,colors(i));
-    plot(n_bits, theoretical_snr,[colors(i) '--'], 'LineWidth', 0.5);
+    plot(n_bits, theoretical_snr, [colors(i) '--'], 'LineWidth', 0.5);
     hold on;
-    plot(n_bits, simulated_snr,[colors(i) '-'], 'LineWidth', 0.5);
+    plot(n_bits, simulated_snr, [colors(i) '-'], 'LineWidth', 0.5);
 end
+
 xlabel('Number of Bits');
 ylabel('SNR (dB)');
-legend(['Theoretical mu = ' num2str(mu_values(1))], ['Simulated mu = ' num2str(mu_values(1))], ['Theoretical mu = ' num2str(mu_values(2))], ['Simulated mu = ' num2str(mu_values(2))], ['Theoretical mu = ' num2str(mu_values(3))], ['Simulated mu = ' num2str(mu_values(3))],['Theoretical mu = ' num2str(mu_values(4))], ['Simulated mu = ' num2str(mu_values(4))] );
+legend(['Theoretical mu = ' num2str(mu_values(1))], ['Simulated mu = ' num2str(mu_values(1))], ['Theoretical mu = ' num2str(mu_values(2))], ['Simulated mu = ' num2str(mu_values(2))], ['Theoretical mu = ' num2str(mu_values(3))], ['Simulated mu = ' num2str(mu_values(3))], ['Theoretical mu = ' num2str(mu_values(4))], ['Simulated mu = ' num2str(mu_values(4))]);
 title('Input vs. Output');
