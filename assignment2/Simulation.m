@@ -14,6 +14,18 @@ for i = 1:n
     end
 end
 
+channel_output = awgn(gt,20,'measured');
+convolved_1 = conv(channel_output, ht_1);
+convolved_2 = conv(channel_output, ht_2);
+convolved_3 = conv(channel_output, ht_3);
+figure;
+myPlot(channel_output,"time","channel_output","channel output (SNR = 20db)");
+figure;
+myPlot(convolved_1,"time","received signal","unit filter");
+figure;
+myPlot(convolved_2,"time","received signal","not existent");
+figure;
+myPlot(convolved_3,"time","received signal","triangle");
 
 for snr = -10:20
     rt(snr+11,:) = awgn(gt,snr,'measured'); 
@@ -23,6 +35,9 @@ end
 decoded_1 = zeros(31,n);
 decoded_2 = zeros(31,n);
 decoded_3 = zeros(31,n);
+sim_bit_error_1 = zeros(31,n);
+sim_bit_error_2 = zeros(31,n);
+sim_bit_error_3 = zeros(31,n);
 for snr = 1:31
     convolved_1 = conv(rt(snr,:), ht_1);
     convolved_2 = conv(rt(snr,:), ht_2);
@@ -33,6 +48,10 @@ for snr = 1:31
         else
             decoded_1(snr,value) = 0;
         end
+        
+        if decoded_1(snr,value) == signal(value)
+            sim_bit_error_1(snr,value) = 1;
+        end
     end
     
     for value = 1:n
@@ -40,6 +59,9 @@ for snr = 1:31
             decoded_2(snr,value) = 1;
         else
             decoded_2(snr,value) = 0;
+        end
+        if decoded_2(snr,value) == signal(value)
+            sim_bit_error_2(snr,value) = 1;
         end
     end
     
@@ -49,21 +71,22 @@ for snr = 1:31
         else
             decoded_3(snr,value) = 0;
         end
+        
+        if decoded_3(snr,value) == signal(value)
+            sim_bit_error_3(snr,value) = 1;
+        end
     end
 end
-
-
+% figure;
+% myPlot(sim_bit_error_1,"sim_bit_error_1","sim_bit_error_1","sim_bit_error_1");
+% figure;
+% myPlot(sim_bit_error_2,"sim_bit_error_1","sim_bit_error_1","sim_bit_error_1");
+% figure;
+% myPlot(sim_bit_error_3,"sim_bit_error_1","sim_bit_error_1","sim_bit_error_1");
 
 disp([decoded_1]);
 disp([decoded_2]);
 disp([decoded_3]);
 disp([signal]);
-% disp(["signal",signal]);
-% % disp(["convolved_1",convolved_1]);
-% disp(["decoded_1",decoded_1]);
-% plot(ht_3); % plot the triangle signal
-% xlabel('Index'); % label the x-axis
-% ylabel('Value'); % label the y-axis
-% title('Right Angled Triangle Signal'); % add a title to the plot
 
 
