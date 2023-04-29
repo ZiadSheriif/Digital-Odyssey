@@ -16,7 +16,7 @@ end
 
 
 for snr = -10:20
-    rt(snr+11,:) = awgn(gt,snr,'measured');
+    rt(snr+11,:) = awgn(gt,snr,'measured'); 
 end
 % disp(rt);
 
@@ -27,9 +27,8 @@ for snr = 1:31
     convolved_1 = conv(rt(snr,:), ht_1);
     convolved_2 = conv(rt(snr,:), ht_2);
     convolved_3 = conv(rt(snr,:), ht_3);
-    
     for value = 1:n
-        if convolved_1((value-1)*10+5) >= 0
+        if convolved_1(value*10) >= 0
             decoded_1(snr,value) = 1;
         else
             decoded_1(snr,value) = 0;
@@ -37,7 +36,7 @@ for snr = 1:31
     end
     
     for value = 1:n
-        if convolved_2((value-1)*10+5) >= 0
+        if convolved_2(value*10) >= 0
             decoded_2(snr,value) = 1;
         else
             decoded_2(snr,value) = 0;
@@ -45,13 +44,15 @@ for snr = 1:31
     end
     
     for value = 1:n
-        if convolved_3((value-1)*10+5) >= 0
+        if convolved_3(value*10) >= 0
             decoded_3(snr,value) = 1;
         else
             decoded_3(snr,value) = 0;
         end
     end
 end
+
+
 
 disp([decoded_1]);
 disp([decoded_2]);
