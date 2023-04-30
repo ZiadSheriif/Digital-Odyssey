@@ -1,4 +1,4 @@
-n = 20000; % replace with desired size of arr
+n = 1000; % replace with desired size of arr
 signal = randi([0,1],1,n); % generate array of random 0s and 1s
 gt = zeros(1,10*n); % initialize gt with zeros
 rt = zeros(31,10*n); % initialize gt with zeros
@@ -30,7 +30,7 @@ figure;myPlot(convolved_3,"time","received signal","triangle");
 
 % Add AWGN to the pulse signal
 for snr = -10:20
-    rt(snr+11,:) = awgn(gt,snr,'measured'); 
+    rt(snr+11,:) = awgn(gt,snr); 
 end
 
 decoded_1 = zeros(31,n);
@@ -84,39 +84,19 @@ disp(simulated_BER_2/n);
 disp(simulated_BER_3/n);
 
 % Plot both arrays on the same graph with different colors
-plot(1:31, simulated_BER_1/n, 'r'); % Use red color for y1
+semilogy(1:31, simulated_BER_1/n, 'r', 'LineWidth', 2); % Use red color for y1
 hold on; % Keep the current plot and add new plots to it
-plot(1:31, 1/2.*erfc(sqrt(1:31)), 'b'); % Use blue color for y2
+semilogy(1:31, simulated_BER_2/n, 'm', 'LineWidth', 2); % Use red color for y1
+hold on; % Keep the current plot and add new plots to it
+semilogy(1:31, simulated_BER_3/n, 'g', 'LineWidth', 2); % Use red color for y1
+hold on; % Keep the current plot and add new plots to it
+semilogy(1:31, 1/2.*erfc(-10:20), 'b', 'LineWidth', 2); % Use blue color for y2
 hold off; % Release the current plot and reset the plot settings
 % Add labels and a legend
 xlabel('SNR');
 ylabel('BER');
 title('Plot of BER');
-legend('simulated bit error rate', 'theortical bit error rate');
-
-figure;
-% Plot both arrays on the same graph with different colors
-plot(1:31, simulated_BER_2/n, 'r'); % Use red color for y1
-hold on; % Keep the current plot and add new plots to it
-plot(1:31, 1/2.*erfc(sqrt(1:31)), 'b'); % Use blue color for y2
-hold off; % Release the current plot and reset the plot settings
-% Add labels and a legend
-xlabel('SNR');
-ylabel('BER');
-title('Plot of BER');
-legend('simulated bit error rate', 'theortical bit error rate');
-
-figure;
-% Plot both arrays on the same graph with different colors
-plot(1:31, simulated_BER_3/n, 'r'); % Use red color for y1
-hold on; % Keep the current plot and add new plots to it
-plot(1:31, 1/2.*erfc(sqrt(1:31)), 'b'); % Use blue color for y2
-hold off; % Release the current plot and reset the plot settings
-% Add labels and a legend
-xlabel('SNR');
-ylabel('BER');
-title('Plot of BER');
-legend('simulated bit error rate', 'theortical bit error rate');
+legend('Unit','Pulse','Triangler', 'theortical bit error rate');
 
 % disp([decoded_1]);
 % disp([decoded_2]);
