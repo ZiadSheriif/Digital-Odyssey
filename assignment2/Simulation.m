@@ -91,7 +91,7 @@ for snr = 1:31
         end
     end
     E = PowerSignal(gt);
-    N0 = E / (10^(snr / 10));
+    N0 = E / (10^((snr-11) / 10));
     normal_value = 10^((snr-11)/10); 
     BER1_vec_thr(snr)= BERTheoritcal(N0);%0.5*erfc(sqrt(normal_value));% matched
     BER2_vec_thr(snr)= BERTheoritcal(N0);%0.5*erfc(sqrt(normal_value));% not existent
@@ -101,9 +101,6 @@ end
 
 snr = -10:20;
 
-%disp(simulated_BER_1/n);
-%disp(simulated_BER_2/n);
-%disp(simulated_BER_3/n);
 figure;
 %Plot both arrays on the same graph with different colors
 semilogy(snr, simulated_BER_1/n,'-r', 'LineWidth', 1); % Use red color for y1
@@ -123,44 +120,6 @@ title('Plot of BER');
 legend('matched sim','matched theo','not existent sim','not existent theo','linear sim','linear theo');
 ylim([1/n*100 1]);
 
-% figure;
-% hold on; % Keep the current plot and add new plots to it
-% % Plot both arrays on the same graph with different colors
-% semilogy(-10:20, BER1_vec_thr, 'r', 'LineWidth', 2); % Use red color for y1
-% hold on; % Keep the current plot and add new plots to it
-% semilogy(-10:20, BER2_vec_thr, 'm', 'LineWidth', 2); % Use red color for y1
-% hold on; % Keep the current plot and add new plots to it
-% semilogy(-10:20, BER3_vec_thr, 'g', 'LineWidth', 2); % Use red color for y1
-% 
-% xlabel('SNR');
-% ylabel('BER');
-% title('Plot of theoritical BER');
-% legend('Unit','Pulse','Triangler');
-
-
-% figure;
-% %semilogy(-10:20, 1/2.*erfc(-10:20), 'b', 'LineWidth', 2); % Use blue color for y2
-% semilogy(-10:20, 1/2.*erfc(sqrt(10.^((-10:20)/10))), 'b', 'LineWidth', 2); % Use blue color for y2
-% % Add labels and a legend
-% xlabel('SNR');
-% ylabel('BER');
-% title('Plot of BER');
-% legend('theortical bit error rate');
-% 
-% 
-% figure;
-% %semilogy(-10:20, 1/2.*erfc(-10:20), 'b', 'LineWidth', 2); % Use blue color for y2
-% semilogy(-10:20, qfunc(1/sqrt()), 'b', 'LineWidth', 2); % Use blue color for y2
-% % Add labels and a legend
-% xlabel('SNR');
-% ylabel('BER');
-% title('Plot of BER');
-% legend('theortical bit error rate');
-
-% disp([decoded_1]);
-% disp([decoded_2]);
-% disp([decoded_3]);
-% disp([signal]);
 function BER = BERTheoritcal(N0)
     BER = 0.5 * erfc(1/((N0)^0.5));
 end
