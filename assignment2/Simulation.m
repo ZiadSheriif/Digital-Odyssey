@@ -1,130 +1,227 @@
-close all;
-n = 50000; % Example size
+
+num_of_bits = 6;
+samples_per_bit = 4;
+
+binary_data = randi([0 1], 1, num_of_bits);
+g  = binaryDataSampled(binary_data, num_of_bits, samples_per_bit);
+
+% Plot random bits  
+t = 1:1:num_of_bits;
+figure;
+stem(t,binary_data,'o');
+ylabel('Shaped pulses');
+title('Binary Data')
+
+% Plot random bits sampled 
+t = 0:1/samples_per_bit:num_of_bits;
+figure;
+stem(t,g,'o');
+ylabel('Shaped pulses');
+title('Pulse Data sampled at rate 4')
+
+h1 = rectFilter(samples_per_bit);
+h2 = holdFilter(samples_per_bit);
+h3 = linearFilter(samples_per_bit);
+
+% Plot 3 filters h1, h2 and h3
+t = 0:1/samples_per_bit:1;
+figure;
+subplot(3,1,1);
+stem(t,h1);
+ylabel('h1');
+title('matched filter')
+subplot(3,1,2);
+stem(t,h2);
+ylabel('h2');
+title('hold filter')
+subplot(3,1,3);
+stem(t,h3);
+ylabel('h3');
+title('linear filter')
+
+
+% Add noise to the transmitted signal
+E = PowerSignal(g);
+snr = 10;
+N0 = E / (10^(snr / 10));
+r = awgn(g, snr, 'measured');
+
+% apply 3 filters with input data with noise
+%y1 = conv(r, h1,'same');
+%y2 = conv(r, h2,'same');
+%y3 = conv(r, h3,'same');
+y1 = conv(r, h1);
+y2 = conv(r, h2);
+y3 = conv(r, h3);
+y1(y1>1)=1;
+y1(y1<-1)=-1;
+y2(y2>1)=1;
+y2(y2<-1)=-1;
+y3(y3>1)=1;
+y3(y3<-1)=-1;
+g_decoded = DecodeSignal(g,0,num_of_bits,samples_per_bit);
+y1_decoded = DecodeSignal(y1,0,num_of_bits,samples_per_bit);
+y2_decoded = DecodeSignal(y2,0,num_of_bits,samples_per_bit);
+y3_decoded = DecodeSignal(y3,0,num_of_bits,samples_per_bit);
+
+BER1 = BitErrorRate(binary_data,y1_decoded);
+BER2 = BitErrorRate(binary_data,y2_decoded);
+BER3 = BitErrorRate(binary_data,y3_decoded);
+
+BER1_theo = BERTheoritcal(N0);
+BER2_theo = BERTheoritcal(N0);
+BER3_theo = BERTheoritcal(4*N0/3);
+
+fprintf("BER1_theo at snr = 10: %f \n", BER1_theo );
+fprintf("BER2_theo at snr = 10: %f \n", BER2_theo );
+fprintf("BER3_theo at snr = 10: %f \n", BER3_theo );
+
+% Plot output of 3 received filters y1, y2 and y3
+
+t = 0:1/samples_per_bit:num_of_bits+1;
+t_decoded = 1:1:num_of_bits;
+% plot output of matched filter
+figure;
+subplot(3,1,1);
+hold on;
+stem(t ,y1, 'ro');
+y1_decoded(y1_decoded==0) = -1; % plot -1 instead of zero
+stem(t_decoded,y1_decoded, 'bo');
+plot(t ,y1,'g');
+ylabel('matched filter');
+title('matched filter output')
+legend('output matched filter','output matched filter sampled','output matched filter continous');
+
+% plot output of holf filter
+subplot(3,1,2);
+hold on;
+stem(t ,y2, 'ro');
+y2_decoded(y2_decoded==0) = -1;
+stem(t_decoded,y2_decoded, 'bo'); % plot -1 instead of zero
+plot(t ,y2,'g');
+ylabel('hold filter');
+title('hold filter output')
+legend('output hold filter','output hold filter sampled','output hold filter continous');
+
+% plot output of linear filter
+subplot(3,1,3);
+hold on;
+stem(t ,y3, 'ro');
+y3_decoded(y3_decoded==0) = -1;
+stem(t_decoded,y3_decoded, 'bo');
+plot(t ,y3,'g');
+ylabel('linear filter');
+title('linear filter output')
+legend('output linear filter','output linear filter sampled','output linear filter continous');
+
+
+
+%----------------------------------- loop on different snr
+num_of_bits = 50000;
 samples_per_bit = 10;
 
-signal = zeros(1, n); % Initialize array of zeros
-signal(1:n/2) = 1; % Set first n/2 elements to ones
-signal = signal(randperm(n)); % Shuffle the array randomly
+binary_data = randi([0 1], 1, num_of_bits);
+g  = binaryDataSampled(binary_data, num_of_bits, samples_per_bit);
 
-disp(1:10:100);
-gt = zeros(1,samples_per_bit*n); % initialize gt with zeros
-rt = zeros(31,samples_per_bit*n); % initialize gt with zeros
+% create 3 filters h1, h2 and h3
+h1 = rectFilter(samples_per_bit);
+h2 = holdFilter(samples_per_bit);
+h3 = linearFilter(samples_per_bit);
 
-ht_1 = ones(1,samples_per_bit);% Unit filter matched
-ht_2 = zeros(1,samples_per_bit); ht_2(round(samples_per_bit/2)) = 1;% Pulse not exsistant
-ht_3 = linspace(0, sqrt(3), samples_per_bit);% Triangler
-
-% Convert binary data to pulse signal
-for i = 1:n
-    if signal(i) == 1
-        gt(samples_per_bit*(i-1)+1:samples_per_bit*i) = 1; % set 10 corresponding elements in gt to value of arr element
-    else
-        gt(samples_per_bit*(i-1)+1:samples_per_bit*i) = -1; % set 10 corresponding elements in gt to value of arr element
-    end
+snr = -10:1:20;
+BER1_practical = zeros(1,length(snr));
+BER1_theoritcal = zeros(1,length(snr));
+BER2_practical = zeros(1,length(snr));
+BER2_theoritcal = zeros(1,length(snr));
+BER3_practical = zeros(1,length(snr));
+BER3_theoritcal = zeros(1,length(snr));
+for i = 1 : length(snr)
+    E = PowerSignal(g);
+    N0 = E / (10^(snr(i) / 10));
+    r = awgn(g, snr(i), 'measured');    
+    y1 = conv(r, h1);
+    y2 = conv(r, h2);
+    y3 = conv(r, h3);
+    y1_decoded = DecodeSignal(y1,0,num_of_bits,samples_per_bit);
+    y2_decoded = DecodeSignal(y2,0,num_of_bits,samples_per_bit);
+    y3_decoded = DecodeSignal(y3,0,num_of_bits,samples_per_bit);
+    BER1_practical(i) = BitErrorRate(binary_data,y1_decoded);
+    BER2_practical(i) = BitErrorRate(binary_data,y2_decoded);
+    BER3_practical(i) = BitErrorRate(binary_data,y3_decoded);
+    BER1_theoritcal(i) = BERTheoritcal(N0);
+    BER2_theoritcal(i) = BERTheoritcal(N0);
+    BER3_theoritcal(i) = BERTheoritcal(4*N0/3); % so that erfc be sqrt(3) / 2*sqrt(No)
 end
 
-disp(size(gt));
-% Receive the signal (Receiver filter)
-channel_output = awgn(gt,20,'measured');
-convolved_1 = conv(channel_output, ht_1); %Convolve the signal with unit filter
-convolved_2 = conv(channel_output, ht_2); %Convolve the signal with pulse filter
-convolved_3 = conv(channel_output, ht_3); %Convolve the signal with triangler filter
-
-% Plot the received signals and the channel output
-figure;myPlot(channel_output,"time","channel_output","channel output (SNR = 20db)");
-figure;myPlot(convolved_1,"time","received signal","unit filter");
-figure;myPlot(convolved_2,"time","received signal","not existent");
-figure;myPlot(convolved_3,"time","received signal","triangle");
-
-% Add AWGN to the pulse signal
-for snr = -10:20
-    rt(snr+11,:) = awgn(gt,snr,'measured'); 
-end
-
-decoded_1 = zeros(31,n);
-decoded_2 = zeros(31,n);
-decoded_3 = zeros(31,n);
-
-simulated_BER_1 = zeros(1,31);
-simulated_BER_2 = zeros(1,31);
-simulated_BER_3 = zeros(1,31);
-
-BER1_vec_thr = zeros(1,31);
-BER2_vec_thr = zeros(1,31);
-BER3_vec_thr = zeros(1,31);
-
-for snr = 1:31
-    convolved_1 = conv(rt(snr,:), ht_1);
-    convolved_2 = conv(rt(snr,:), ht_2);
-    convolved_3 = conv(rt(snr,:), ht_3);
-   
-    for value = 1:n
-        if convolved_1(value*samples_per_bit) >= 0
-            decoded_1(snr,value) = 1;
-        else
-            decoded_1(snr,value) = 0;
-        end
-        
-        if decoded_1(snr,value) ~= signal(value)
-            simulated_BER_1(snr)= simulated_BER_1(snr) + 1;
-        end
-    end
-    for value = 1:n
-        if convolved_2(value*samples_per_bit) >= 0
-            decoded_2(snr,value) = 1;
-        else
-            decoded_2(snr,value) = 0;
-        end
-        if decoded_2(snr,value) ~= signal(value)
-            simulated_BER_2(snr)= simulated_BER_2(snr) + 1;
-        end
-    end
-    for value = 1:n
-        if convolved_3(value*samples_per_bit) >= 0
-            decoded_3(snr,value) = 1;
-        else
-            decoded_3(snr,value) = 0;
-        end
-        
-        if decoded_3(snr,value) ~= signal(value)
-            simulated_BER_3(snr)= simulated_BER_3(snr) + 1;
-        end
-    end
-    E = PowerSignal(gt);
-    N0 = E / (10^((snr-11) / 10));
-    normal_value = 10^((snr-11)/10); 
-    BER1_vec_thr(snr)= BERTheoritcal(N0);%0.5*erfc(sqrt(normal_value));% matched
-    BER2_vec_thr(snr)= BERTheoritcal(N0);%0.5*erfc(sqrt(normal_value));% not existent
-    BER3_vec_thr(snr)= BERTheoritcal(4*N0/3);%0.5*erfc((sqrt(3)/(2)*sqrt(normal_value))); % linear
-end
-
-
-snr = -10:20;
+% plot BER practical and theoritcal of 3 different systems
 
 figure;
-%Plot both arrays on the same graph with different colors
-semilogy(snr, simulated_BER_1/n,'-r', 'LineWidth', 1); % Use red color for y1
-hold on; % Keep the current plot and add new plots to it
-semilogy(snr, BER1_vec_thr,'--r' ,'LineWidth', 1); % Use red color for y1
-hold on; % Keep the current plot and add new plots to it
-semilogy(snr, simulated_BER_2/n,'-g', 'LineWidth', 1); % Use red color for y1
-hold on; % Keep the current plot and add new plots to it
-semilogy(snr, BER2_vec_thr, '--g','LineWidth', 1); % Use red color for y1
-hold on; % Keep the current plot and add new plots to it
-semilogy(snr, simulated_BER_3/n','b','LineWidth', 1); % Use red color for y1
-hold on; % Keep the current plot and add new plots to it
-semilogy(snr, BER3_vec_thr,'--b','LineWidth', 1); % Use red color for y1
-xlabel('SNR');
-ylabel('BER');
-title('Plot of BER');
-legend('matched sim','matched theo','not existent sim','not existent theo','linear sim','linear theo');
-ylim([1/n*100 1]);
+hold on;
+semilogy(snr, BER1_practical, 'LineWidth', 1);
+semilogy(snr, BER1_theoritcal, 'LineWidth', 1);
+semilogy(snr, BER2_practical, 'LineWidth', 1);
+semilogy(snr, BER2_theoritcal, 'LineWidth', 1);
+semilogy(snr, BER3_practical, 'LineWidth', 1);
+semilogy(snr, BER3_theoritcal, 'LineWidth', 1);
+grid on;
 
-function BER = BERTheoritcal(N0)
-    BER = 0.5 * erfc(1/((N0)^0.5));
-end
+legend('practical matched ', 'theoritcal matched', 'practical hold','theoritcal hold','practical linear','theoritcal linear');
+xlabel('E/No');
+ylabel('BER');
+title('BER');
+
+%--------------------------------- Needed functions ----------------------------------
 function p = PowerSignal(input)
     p = mean((input).^2 );
 end
 
+function ouput = DecodeSignal(input,threshold,num_of_bits,samples_per_bit)  
+    ouput = zeros(1,num_of_bits);
+    for i = 1 : num_of_bits
+        if input((i)*samples_per_bit ) > threshold
+            ouput(i) =  1;
+        else
+            ouput(i) =  0;
+        end
+    end
+end
 
+function BER = BitErrorRate(input,output)
+    BER = 0;
+    for i = 1 : length(input)
+        if input(i) ~= output(i)
+            BER = BER + 1;
+        end
+    end
+    BER= BER/length(input);
+end
+function BER = BERTheoritcal(N0)
+
+    BER = 0.5 * erfc(1/((N0)^0.5));
+end
+
+function filter = rectFilter(samples_per_bit)
+    filter = ones(1, samples_per_bit + 1);
+end
+function filter = holdFilter(samples_per_bit)
+    filter = zeros(1, samples_per_bit + 1);
+    filter(round(samples_per_bit/2)+1) = 1;
+end
+function filter = linearFilter(samples_per_bit)
+    filter = zeros(1, samples_per_bit+1);
+    for i = 2:samples_per_bit + 1
+        filter(i) = filter(i-1) + sqrt(3)/samples_per_bit;
+    end
+end
+function g = binaryDataSampled(binary_data,num_of_bits,samples_per_bit)
+    g = zeros(1, num_of_bits * samples_per_bit+1);
+    t = 0:1/samples_per_bit:num_of_bits;
+    for i = 1:num_of_bits
+        if binary_data(i) == 1
+            g((i-1)*(samples_per_bit) + 1:i*samples_per_bit) = 1;
+        else
+            g((i-1)*(samples_per_bit) + 1:i*samples_per_bit) = -1;
+        end
+    end
+
+end
