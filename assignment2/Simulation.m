@@ -36,7 +36,6 @@ figure;myPlot(convolved_1,"time","received signal","unit filter");
 figure;myPlot(convolved_2,"time","received signal","not existent");
 figure;myPlot(convolved_3,"time","received signal","triangle");
 
-
 % Add AWGN to the pulse signal
 for snr = -10:20
     rt(snr+11,:) = awgn(gt,snr,'measured'); 
@@ -45,9 +44,11 @@ end
 decoded_1 = zeros(31,n);
 decoded_2 = zeros(31,n);
 decoded_3 = zeros(31,n);
+
 simulated_BER_1 = zeros(1,31);
 simulated_BER_2 = zeros(1,31);
 simulated_BER_3 = zeros(1,31);
+
 BER1_vec_thr = zeros(1,31);
 BER2_vec_thr = zeros(1,31);
 BER3_vec_thr = zeros(1,31);
@@ -56,7 +57,7 @@ for snr = 1:31
     convolved_1 = conv(rt(snr,:), ht_1);
     convolved_2 = conv(rt(snr,:), ht_2);
     convolved_3 = conv(rt(snr,:), ht_3);
-    
+   
     for value = 1:n
         if convolved_1(value*samples_per_bit) >= 0
             decoded_1(snr,value) = 1;
@@ -89,11 +90,15 @@ for snr = 1:31
             simulated_BER_3(snr)= simulated_BER_3(snr) + 1;
         end
     end
+    E = PowerSignal(gt);
+    N0 = E / (10^(snr / 10));
     normal_value = 10^((snr-11)/10); 
-    BER1_vec_thr(snr)=0.5*erfc(sqrt(normal_value));% matched
-    BER2_vec_thr(snr)=0.5*erfc(sqrt(normal_value));% not existent
-    BER3_vec_thr(snr)=0.5*erfc((sqrt(3)/(2)*sqrt(normal_value))); % linear
+    BER1_vec_thr(snr)= BERTheoritcal(N0);%0.5*erfc(sqrt(normal_value));% matched
+    BER2_vec_thr(snr)= BERTheoritcal(N0);%0.5*erfc(sqrt(normal_value));% not existent
+    BER3_vec_thr(snr)= BERTheoritcal(4*N0/3);%0.5*erfc((sqrt(3)/(2)*sqrt(normal_value))); % linear
 end
+
+
 snr = -10:20;
 
 %disp(simulated_BER_1/n);
@@ -156,5 +161,11 @@ ylim([1/n*100 1]);
 % disp([decoded_2]);
 % disp([decoded_3]);
 % disp([signal]);
+function BER = BERTheoritcal(N0)
+    BER = 0.5 * erfc(1/((N0)^0.5));
+end
+function p = PowerSignal(input)
+    p = mean((input).^2 );
+end
 
 
