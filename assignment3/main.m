@@ -15,7 +15,7 @@ s2(t <= 0.75) = 0;
 
 % Plot the signal
 figure;
-plot(t, s1);
+plot(t, s1, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
 title('Rectangular-like Signal (s1)');
@@ -23,7 +23,7 @@ grid on;
 
 % Plot the signal
 figure;
-plot(t, s2);
+plot(t, s2, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
 title('Signal s2: Two Rectangles');
@@ -41,34 +41,18 @@ grid on;
 % Plot the obtained basis functions for s1
 figure;
 subplot(2, 1, 1);
-plot(t, phi1);
+plot(t, phi1, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
-title('Basis Function \phi_1 for s_1');
+title('Basis Function \phi_1');
 grid on;
 
 subplot(2, 1, 2);
-plot(t, phi2);
+plot(t, phi2, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
-title('Basis Function \phi_2 for s_1');
+title('Basis Function \phi_2');
 grid on;
-
-% Plot the obtained basis functions for s2
-% figure;
-% subplot(2, 1, 1);
-% plot(t, phi1_s2);
-% xlabel('Time');
-% ylabel('Magnitude');
-% title('Basis Function \phi_1 for s_2');
-% grid on;
-% 
-% subplot(2, 1, 2);
-% plot(t, phi2_s2);
-% xlabel('Time');
-% ylabel('Magnitude');
-% title('Basis Function \phi_2 for s_2');
-% grid on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -143,7 +127,7 @@ reconstructed_s2 = v1_s2 * phi1 + v2_s2 * phi2;
 % Plot the original signals and the reconstructed signals
 figure;
 subplot(2, 1, 1);
-plot(t, s1, 'b', t, reconstructed_s1, 'r--');
+plot(t, s1, 'b', t, reconstructed_s1, 'r--', 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
 title('Original Signal s_1 vs Reconstructed Signal');
@@ -151,7 +135,7 @@ legend('Original s_1', 'Reconstructed s_1');
 grid on;
 
 subplot(2, 1, 2);
-plot(t, s2, 'b', t, reconstructed_s2, 'r--');
+plot(t, s2, 'b', t, reconstructed_s2, 'r--', 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
 title('Original Signal s_2 vs Reconstructed Signal');
@@ -166,41 +150,31 @@ grid on;
 % Define the SNR levels (in dB)
 SNR_levels = [-5, 0, 10];
 
-% Number of samples
-num_samples = 1000;
-
 figure;
+grid on;
+hold on;
+xlabel('\phi_1');
+ylabel('\phi_2');
+% Plot the signal points
+scatter(v1_s1, v2_s1,'r', 'filled');
+scatter(v1_s2, v2_s2,'m', 'filled');
+
 % Generate samples of r1(t) and r2(t) for each SNR level
 for i = 1:length(SNR_levels)
     % Calculate the noise variance based on the SNR level
     SNR_dB = SNR_levels(i);
-    SNR = 10^(SNR_dB/10);
-    noise_var = 1/SNR;
     
-    % Generate noise samples
-    w = sqrt(noise_var) * randn(1, num_samples);
-    
-    % Generate samples of r1(t) and r2(t)
-    r1 = s1 + w;
-    r2 = s2 + w;
+    % Generate samples of r1(t) and r2(t) using awgn
+    r1 = awgn(s1, SNR_dB, 'measured');
+    r2 = awgn(s2, SNR_dB, 'measured');
     
     % Calculate the signal space representation of r1(t) and r2(t)
-    [v1_r1, v2_r1] = signal_space(r1, phi1_s1, phi2_s1);
-    [v1_r2, v2_r2] = signal_space(r2, phi1_s2, phi2_s2);
+    [v1_r1, v2_r1] = signal_space(r1, phi1, phi2);
+    [v1_r2, v2_r2] = signal_space(r2, phi1, phi2);
     
     % Plot the signal points
-    scatter(v1_r1, v2_r1, 'filled');
-    xlabel('Projection onto \phi_1 for r_1(t)');
-    ylabel('Projection onto \phi_2 for r_1(t)');
-    title(sprintf('Signal Points at SNR = %d dB', SNR_dB));
-    grid on;
-    hold on;
-    scatter(v1_r2, v2_r2, 'filled');
-    xlabel('Projection onto \phi_1 for r_1(t)');
-    ylabel('Projection onto \phi_2 for r_1(t)');
-    title(sprintf('Signal Points at SNR = %d dB', SNR_dB));
-    grid on;
-    hold on;
+    scatter(v1_r1, v2_r1,'r', 'filled');
+    scatter(v1_r2, v2_r2,'m', 'filled');
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
