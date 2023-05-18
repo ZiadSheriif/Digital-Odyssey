@@ -178,5 +178,20 @@ for i = 1:length(SNR_levels)
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%{
+TODO: NEED review
+
+4. How does the noise affect the signal space? Does the noise effect increase or decrease with increasing ?2?
+
+The noise in the signal affects the signal space representation by introducing additional variability and spreading out the signal points. When the noise variance ?^2 increases, the effect of noise becomes more prominent.
+
+Specifically, as ?^2 increases:
+
+The spread of the signal points in the signal space increases. This is because higher noise levels cause more uncertainty in the signal measurements, leading to larger variations in the signal projections onto the basis functions.
+The signal points become more dispersed and less concentrated around the ideal positions determined by the original signals and basis functions. The noise introduces randomness, causing the signal points to deviate from the expected positions.
+The distinction between different signal points becomes less clear. With higher noise levels, the signal points may overlap or cluster together, making it more challenging to distinguish between different signals or determine their relative positions in the signal space.
+In summary, the effect of noise on the signal space representation increases with increasing noise variance ?^2. Higher noise levels lead to greater spread, dispersion, and reduced distinguishability of the signal points in the signal space.
+%}
+
 
 
