@@ -81,11 +81,13 @@ grid on;
 % Calculate the signal space representation of s2
 [v1_s2, v2_s2] = signal_space(s2, phi1, phi2);
 
+disp([v1_s1,v2_s1]);
+disp([v1_s2,v2_s2]);
 % Plot the signal space representation for s1 and s2 as scatter plot
 figure;
-scatter(v1_s1, v1_s2, 'filled');
+scatter(v1_s1, v2_s1, 'filled');
 hold on;
-scatter(v2_s1, v2_s2, 'filled');
+scatter(v1_s2, v2_s2, 'filled');
 xlabel('Projection onto \phi_1');
 ylabel('Projection onto \phi_2');
 title('Signal Space Representation');
@@ -156,8 +158,51 @@ title('Original Signal s_2 vs Reconstructed Signal');
 legend('Original s_2', 'Reconstructed s_2');
 grid on;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Effect of AWGN on signal space representation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Define the SNR levels (in dB)
+SNR_levels = [-5, 0, 10];
+
+% Number of samples
+num_samples = 1000;
+
+figure;
+% Generate samples of r1(t) and r2(t) for each SNR level
+for i = 1:length(SNR_levels)
+    % Calculate the noise variance based on the SNR level
+    SNR_dB = SNR_levels(i);
+    SNR = 10^(SNR_dB/10);
+    noise_var = 1/SNR;
+    
+    % Generate noise samples
+    w = sqrt(noise_var) * randn(1, num_samples);
+    
+    % Generate samples of r1(t) and r2(t)
+    r1 = s1 + w;
+    r2 = s2 + w;
+    
+    % Calculate the signal space representation of r1(t) and r2(t)
+    [v1_r1, v2_r1] = signal_space(r1, phi1_s1, phi2_s1);
+    [v1_r2, v2_r2] = signal_space(r2, phi1_s2, phi2_s2);
+    
+    % Plot the signal points
+    scatter(v1_r1, v2_r1, 'filled');
+    xlabel('Projection onto \phi_1 for r_1(t)');
+    ylabel('Projection onto \phi_2 for r_1(t)');
+    title(sprintf('Signal Points at SNR = %d dB', SNR_dB));
+    grid on;
+    hold on;
+    scatter(v1_r2, v2_r2, 'filled');
+    xlabel('Projection onto \phi_1 for r_1(t)');
+    ylabel('Projection onto \phi_2 for r_1(t)');
+    title(sprintf('Signal Points at SNR = %d dB', SNR_dB));
+    grid on;
+    hold on;
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
