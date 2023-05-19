@@ -11,14 +11,14 @@ s1 = ones(size(t)); % Magnitude of 1
 
 % Generate s2
 s2 = -ones(size(t));
-s2(t <= 0.75) = 0;
+s2(t <= 0.75) = 1;
 
 % Plot the signal
 figure;
 plot(t, s1, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
-title('Rectangular-like Signal (s1)');
+title('Signal s1');
 grid on;
 
 % Plot the signal
@@ -26,7 +26,7 @@ figure;
 plot(t, s2, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
-title('Signal s2: Two Rectangles');
+title('Signal s2');
 grid on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,8 +65,6 @@ grid on;
 % Calculate the signal space representation of s2
 [v1_s2, v2_s2] = signal_space(s2, phi1, phi2);
 
-disp([v1_s1,v2_s1]);
-disp([v1_s2,v2_s2]);
 % Plot the signal space representation for s1 and s2 as scatter plot
 figure;
 scatter(v1_s1, v2_s1, 'filled');
@@ -79,41 +77,41 @@ legend('\phi_1', '\phi_2');
 grid on;
 
 
-% Plot the signal space representation for s1
-figure;
-subplot(2, 1, 1);
-stem(1, v1_s1);
-xlim([0, 2]);
-xlabel('Basis Functions');
-ylabel('Projection');
-title('Signal Space Representation of s_1');
-grid on;
+% % Plot the signal space representation for s1
+% figure;
+% subplot(2, 1, 1);
+% stem(1, v1_s1);
+% xlim([0, 2]);
+% xlabel('Basis Functions');
+% ylabel('Projection');
+% title('Signal Space Representation of s_1');
+% grid on;
+% 
+% subplot(2, 1, 2);
+% stem(1:2, [v1_s1, v2_s1]);
+% xlim([0, 3]);
+% xlabel('Basis Functions');
+% ylabel('Projection');
+% title('Signal Space Representation of s_1');
+% grid on;
 
-subplot(2, 1, 2);
-stem(1:2, [v1_s1, v2_s1]);
-xlim([0, 3]);
-xlabel('Basis Functions');
-ylabel('Projection');
-title('Signal Space Representation of s_1');
-grid on;
-
-% Plot the signal space representation for s2
-figure;
-subplot(2, 1, 1);
-stem(1, v1_s2);
-xlim([0, 2]);
-xlabel('Basis Functions');
-ylabel('Projection');
-title('Signal Space Representation of s_2');
-grid on;
-
-subplot(2, 1, 2);
-stem(1:2, [v1_s2, v2_s2]);
-xlim([0, 3]);
-xlabel('Basis Functions');
-ylabel('Projection');
-title('Signal Space Representation of s_2');
-grid on;
+% % Plot the signal space representation for s2
+% figure;
+% subplot(2, 1, 1);
+% stem(1, v1_s2);
+% xlim([0, 2]);
+% xlabel('Basis Functions');
+% ylabel('Projection');
+% title('Signal Space Representation of s_2');
+% grid on;
+% 
+% subplot(2, 1, 2);
+% stem(1:2, [v1_s2, v2_s2]);
+% xlim([0, 3]);
+% xlabel('Basis Functions');
+% ylabel('Projection');
+% title('Signal Space Representation of s_2');
+% grid on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
