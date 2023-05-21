@@ -4,7 +4,7 @@ close all;
 % Generate s1 and s2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Generate the time vector
-t = linspace(0, 1, 1000); % Adjust the number of points (1000) as needed
+t = linspace(0, 1, 31); % Adjust the number of points (1000) as needed
 
 % Generate s1
 s1 = ones(size(t)); % Magnitude of 1
@@ -70,8 +70,16 @@ figure;
 scatter(v1_s1, v2_s1, 'filled');
 hold on;
 scatter(v1_s2, v2_s2, 'filled');
+hold on;
+% Plot a line connecting the origin to the specified point
+plot([0, v1_s1], [0, v2_s1], 'r','LineWidth', 2);
+hold on;
+% Plot a line connecting the origin to the specified point
+plot([0, v1_s2], [0, v2_s2], 'b','LineWidth', 2);
 xlabel('Projection onto \phi_1');
 ylabel('Projection onto \phi_2');
+xlim([-0.2,1.2]);
+ylim([-0.2,1.2]);
 title('Signal Space Representation');
 legend('\phi_1', '\phi_2');
 grid on;

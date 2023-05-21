@@ -5,6 +5,6 @@ function [v1, v2] = signal_space(s, phi1, phi2)
     end
 
     % Calculate the projections (correlations) of s over phi1 and phi2
-    v1 = dot(s, phi1);
-    v2 = dot(s, phi2);
+    v1 = dot(s, phi1) / length(phi1);
+    v2 = dot(s, phi2) / length(phi2);
 end
