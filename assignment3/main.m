@@ -148,32 +148,42 @@ grid on;
 % Define the SNR levels (in dB)
 SNR_levels = [-5, 0, 10];
 
-figure;
-grid on;
-hold on;
-xlabel('\phi_1');
-ylabel('\phi_2');
-% Plot the signal points
-scatter(v1_s1, v2_s1,'r', 'filled');
-scatter(v1_s2, v2_s2,'m', 'filled');
+
 
 % Generate samples of r1(t) and r2(t) for each SNR level
 for i = 1:length(SNR_levels)
-    % Calculate the noise variance based on the SNR level
-    SNR_dB = SNR_levels(i);
-    
-    % Generate samples of r1(t) and r2(t) using awgn
-    r1 = awgn(s1, SNR_dB, 'measured');
-    r2 = awgn(s2, SNR_dB, 'measured');
-    
-    % Calculate the signal space representation of r1(t) and r2(t)
-    [v1_r1, v2_r1] = signal_space(r1, phi1, phi2);
-    [v1_r2, v2_r2] = signal_space(r2, phi1, phi2);
-    
+    figure;
+    grid on;
+    hold on;
     % Plot the signal points
-    scatter(v1_r1, v2_r1,'r', 'filled');
-    scatter(v1_r2, v2_r2,'m', 'filled');
+    scatter(v1_s1, v2_s1,'b', 'filled');
+    scatter(v1_s2, v2_s2,'g', 'filled');
+    
+    for j = 1:100
+        % Calculate the noise variance based on the SNR level
+        SNR_dB = SNR_levels(i);
+
+        % Generate samples of r1(t) and r2(t) using awgn
+        r1 = awgn(s1, SNR_dB, 'measured');
+        r2 = awgn(s2, SNR_dB, 'measured');
+
+        % Calculate the signal space representation of r1(t) and r2(t)
+        [v1_r1, v2_r1] = signal_space(r1, phi1, phi2);
+        [v1_r2, v2_r2] = signal_space(r2, phi1, phi2);
+
+        % Plot the signal points
+        scatter(v1_r1, v2_r1,'r');
+        scatter(v1_r2, v2_r2,'m');
+    end
+    xlabel('\phi_1');
+    ylabel('\phi_2');
+    title(['SNR = ' , num2str(SNR_dB)]);
+    
+    % Add legends
+    legend('signal 1', 'signal 2','signal 1 + noise','signal 2 + noise');
 end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %{
