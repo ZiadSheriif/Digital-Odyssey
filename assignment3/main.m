@@ -4,7 +4,7 @@ close all;
 % Generate s1 and s2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Generate the time vector
-t = linspace(0, 1, 31); % Adjust the number of points (1000) as needed
+t = linspace(0, 1, 30); % Adjust the number of points (1000) as needed
 
 % Generate s1
 s1 = ones(size(t)); % Magnitude of 1
@@ -40,14 +40,15 @@ grid on;
 
 % Plot the obtained basis functions for s1
 figure;
-subplot(2, 1, 1);
+%subplot(2, 1, 1);
 plot(t, phi1, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
 title('Basis Function \phi_1');
 grid on;
 
-subplot(2, 1, 2);
+figure;
+%subplot(2, 1, 2);
 plot(t, phi2, 'LineWidth', 2);
 xlabel('Time');
 ylabel('Magnitude');
