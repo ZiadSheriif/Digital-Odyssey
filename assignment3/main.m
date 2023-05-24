@@ -4,7 +4,7 @@ close all;
 % Generate s1 and s2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Generate the time vector
-t = linspace(0, 1, 30); % Adjust the number of points (1000) as needed
+t = linspace(0, 1, 1000); % Adjust the number of points (1000) as needed
 
 % Generate s1
 s1 = ones(size(t)); % Magnitude of 1
@@ -157,7 +157,10 @@ grid on;
 % Define the SNR levels (in dB)
 SNR_levels = [-5, 0, 10];
 
+signal_power = mean(s1.^2);
+SNR_linear = 10.^(SNR_levels/10);
 
+disp(SNR_value);
 
 % Generate samples of r1(t) and r2(t) for each SNR level
 for i = 1:length(SNR_levels)
@@ -171,10 +174,10 @@ for i = 1:length(SNR_levels)
     for j = 1:100
         % Calculate the noise variance based on the SNR level
         SNR_dB = SNR_levels(i);
-
+        
         % Generate samples of r1(t) and r2(t) using awgn
-        r1 = awgn(s1, SNR_dB, 'measured');
-        r2 = awgn(s2, SNR_dB, 'measured');
+        r1 = s1 + sqrt(sum(s1.^2) / SNR_linear(i)) * randn(size(s1));
+        r2 = s2 + sqrt(sum(s2.^2) / SNR_linear(i)) * randn(size(s2));
 
         % Calculate the signal space representation of r1(t) and r2(t)
         [v1_r1, v2_r1] = signal_space(r1, phi1, phi2);
